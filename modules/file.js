@@ -1,7 +1,7 @@
 // Carrega a biblioteca File System para..
 import fs from 'fs';
 
-function files() {
+function file() {
     // Arquivo de dados
     const dataFile = './data/rules.json';
 
@@ -23,4 +23,4 @@ function files() {
     }
 }
 
-export default files;
+export default file;

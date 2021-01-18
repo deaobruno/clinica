@@ -1,6 +1,5 @@
 TODO
 - padronizar corretamente respostas de erros
-- aplicar carregamento único do express
 - configurar inialização corretamente
 - abstrair chamada de rotas
 - validar inserção de regras repetidas
