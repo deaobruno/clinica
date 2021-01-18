@@ -1,6 +1,4 @@
 TODO
-- padronizar corretamente respostas de erros
-- configurar inialização corretamente
 - abstrair chamada de rotas
 - validar inserção de regras repetidas
 - gerar documentação
