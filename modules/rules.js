@@ -29,15 +29,24 @@ function rules() {
         return (rules.length > 0) ? rules[rules.length - 1].id + 1 : 1;
     }
 
+    function insertValidation(start, end) {
+        return rules.find(rule => rule.day === day &&
+            ((rule.start <= start && start <= rule.end ||
+            rule.start <= end && end <= rule.end) ||
+            (start < rule.start && end > rule.end))) === undefined;
+    }
+
     // Gravar registro único
     function createUnique() {
         intervals.forEach((interval) => {
-            rules.push({
-                'id': nextId(),
-                'day': day,
-                'start': interval.start,
-                'end': interval.end
-            });
+            if (insertValidation(interval.start, interval.end)) {
+                rules.push({
+                    'id': nextId(),
+                    'day': day,
+                    'start': interval.start,
+                    'end': interval.end
+                });
+            }
         });
 
         files.saveFile();

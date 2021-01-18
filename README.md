@@ -1,6 +1,5 @@
 TODO
 - abstrair chamada de rotas
-- validar inserção de regras repetidas
 - gerar documentação
 - aplicar TDD
 - converter para TYpescrypt
