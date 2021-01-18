@@ -1,9 +1,7 @@
 TODO
-- corrigir validações
-- implementar gerenciador de erros
+- padronizar corretamente respostas de erros
 - aplicar carregamento único do express
 - configurar inialização corretamente
-- abstrair validação
 - abstrair chamada de rotas
 - validar inserção de regras repetidas
 - gerar documentação
@@ -27,7 +25,6 @@ unique example
     ],
     "flag": "u"
 }
-01
 
 daily example
 {
@@ -44,7 +41,6 @@ daily example
     "flag": "d",
     "limit": "17-01-2021"
 }
-15, 16, 17
 
 weekly example
 {
@@ -62,4 +58,3 @@ weekly example
     "limit": "15-02-2021",
     "weekdays": [1, 3]
 }
-18, 20, 25, 27, 1, 3, 8, 10, 15

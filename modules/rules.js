@@ -1,7 +1,9 @@
 // Carrega a biblioteca Validator para...
-import validator from 'validator';
+import validatorFactory from './validation.js';
+const validation = validatorFactory();
+
 // Carrega a factory do gerenciador do arquivo de regitros
-import filesFactory from './files.js';
+import filesFactory from './file.js';
 const files = filesFactory();
 
 function rules() {
@@ -9,7 +11,18 @@ function rules() {
 
     let newDay = new Date();
 
-    let day, end, intervals, limit, month, ruleDay, start, weekdays;
+    let day, end, endDate, intervals, limit, start, startDate, weekdays;
+
+    const validationRules = {
+        'day': ['empty', 'date'],
+        'end': ['empty', 'time'],
+        'endDate': ['empty', 'date'],
+        'intervals': ['empty'],
+        'limit': ['empty', 'date'],
+        'start': ['empty', 'time'],
+        'startDate': ['empty', 'date'],
+        'weekdays': ['empty', 'array']
+    };
 
     // Retorna o próximo ID disponível
     function nextId() {
@@ -32,7 +45,7 @@ function rules() {
 
     // Gravar registros múltiplos
     function createMultiple() {
-        let weekDay, year;
+        let weekDay, month, ruleDay, year;
 
         for (newDay; newDay <= formatDate(limit); newDay.setDate(newDay.getDate() + 1)) {
             ruleDay = newDay.getDate();
@@ -69,43 +82,31 @@ function rules() {
         limit = params.limit;
         weekdays = params.weekdays;
 
-        // if (validator.isEmpty(intervals))
-        //     throw new Error('Missing "intervals".');
+        validation.validate('intervals', intervals, validationRules['intervals']);
 
         intervals.forEach((interval) => {
-            if (!interval.start || validator.isEmpty(interval.start))
-                throw new Error('Missing start "date".');
-
-            if (!interval.end || validator.isEmpty(interval.end))
-                throw new Error('Missing end "date".');
+            validation.validate('start', interval.start, validationRules['start']);
+            validation.validate('end', interval.end, validationRules['end']);
         });
 
         switch (flag) {
             case 'u':
-                if (!day || validator.isEmpty(day))
-                    throw new Error('Missing "day".');
-
-                if (!validator.isDate(day, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"day" in wrong format.');
+                validation.validate('day', day, validationRules['day']);
 
                 createUnique();
 
                 break;
 
             case 'd':
-                if (!validator.isDate(limit, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"limit" in wrong format.');
+                validation.validate('limit', limit, validationRules['limit']);
 
                 createMultiple();
 
                 break;
 
             case 'w':
-                if (!validator.isDate(limit, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"limit" in wrong format.');
-
-                if (!weekdays)
-                    throw new Error('Missing "weekdays".');
+                validation.validate('limit', limit, validationRules['limit']);
+                validation.validate('weekdays', weekdays, validationRules['weekdays']);
 
                 createMultiple();
 
@@ -133,8 +134,8 @@ function rules() {
 
         dataLengthAfter = rules.length;
 
-        // if (validator.equals(dataLength, dataLengthAfter))
-        //     throw new Error('No rule found to delete.');
+        if (dataLength == dataLengthAfter)
+            throw new Error('No rule found to delete.');
     
         files.saveFile();
 
@@ -148,19 +149,18 @@ function rules() {
 
     // Listar horários disponíveis dentro de um intervalo
     function getInterval(params) {
-        if (validator.isEmpty(params.start))
-            throw new Error('Missing "start".');
+        let ruleDay;
 
-        if (validator.isEmpty(params.end))
-            throw new Error('Missing "end".');
+        validation.validate('start', params.start, validationRules['startDate']);
+        validation.validate('end', params.end, validationRules['endDate']);
 
-        start = formatDate(params.start);
-        end = formatDate(params.end);
+        startDate = formatDate(params.start);
+        endDate = formatDate(params.end);
 
         return rules.filter((rule) => {
             ruleDay = formatDate(rule.day);
 
-            return (start <= ruleDay) && (ruleDay <= end);
+            return (startDate <= ruleDay) && (ruleDay <= endDate);
         });
     }
 
