@@ -6,35 +6,35 @@ const app = express();
 import rulesFactory from '../modules/rules.js';
 
 function framework() {
-    const expressApp = app;
-    const router = express.Router();
-    const rules = rulesFactory();
+  const expressApp = app;
+  const router = express.Router();
+  const rules = rulesFactory();
 
-    // Cadastrar regras de horários para atendimento
-    router.post('/create', (req, res) => {
-        res.json(rules.createRule(req.body));
-    });
+  // Cadastrar regras de horários para atendimento
+  router.post('/create', (req, res) => {
+    res.json(rules.createRule(req.body));
+  });
 
-    // Apagar regra de horário para atendimento
-    router.delete('/delete/:id', (req, res) => {
-        res.json(rules.deleteRule(req.params.id));
-    });
+  // Apagar regra de horário para atendimento
+  router.delete('/delete/:id', (req, res) => {
+    res.json(rules.deleteRule(req.params.id));
+  });
 
-    // Listar regras de horários para atendimento
-    router.get('/list', (req, res) => {
-        res.json(rules.getRules());
-    });
+  // Listar regras de horários para atendimento
+  router.get('/list', (req, res) => {
+    res.json(rules.getRules());
+  });
 
-    // Listar horários disponíveis dentro de um intervalo
-    router.post('/interval', (req, res) => {
-        res.json(rules.getInterval(req.body));
-    });
+  // Listar horários disponíveis dentro de um intervalo
+  router.post('/interval', (req, res) => {
+    res.json(rules.getInterval(req.body));
+  });
 
-    return {
-        expressApp,
-        router,
-        rules
-    }
+  return {
+    expressApp,
+    router,
+    rules
+  }
 }
 
 export default framework;

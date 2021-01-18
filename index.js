@@ -8,7 +8,7 @@ const app = framework.expressApp;
 
 //
 app.use(bodyParser.json({
-    extended: true
+  extended: true
 }));
 
 // Importa o gerenciador de rotas
@@ -16,10 +16,10 @@ app.use(framework.router);
 
 // Callback para padronização de resposta de erros
 app.use(function(err, req, res, next) {
-    if (!err.statusCode)
-        err.statusCode = 500;
+  if (!err.statusCode)
+    err.statusCode = 500;
 
-    res.status(err.statusCode).send(err.message);
+  res.status(err.statusCode).send(err.message);
 });
 
 // Habilita a aplicação a escutar uma porta
