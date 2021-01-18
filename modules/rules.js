@@ -1,175 +1,185 @@
-// Carrega a biblioteca Validator para...
-import validator from 'validator';
+// Carrega a factory de validação
+import validatorFactory from './validation.js';
+const validation = validatorFactory();
+
 // Carrega a factory do gerenciador do arquivo de regitros
-import filesFactory from './files.js';
-const files = filesFactory();
+import fileFactory from './file.js';
+const files = fileFactory();
 
 function rules() {
-    let rules = files.rulesData;
+  let rules = files.rulesData;
 
-    let newDay = new Date();
+  let newDay = new Date();
 
-    let day, end, intervals, limit, month, ruleDay, start, weekdays;
+  let day, end, endDate, intervals, limit, start, startDate, weekdays;
 
-    // Retorna o próximo ID disponível
-    function nextId() {
-        return (rules.length > 0) ? rules[rules.length - 1].id + 1 : 1;
-    }
+  const validationRules = {
+    'day': ['empty', 'date'],
+    'end': ['empty', 'time'],
+    'endDate': ['empty', 'date'],
+    'intervals': ['empty'],
+    'limit': ['empty', 'date'],
+    'start': ['empty', 'time'],
+    'startDate': ['empty', 'date'],
+    'weekdays': ['empty', 'array']
+  };
 
-    // Gravar registro único
-    function createUnique() {
-        intervals.forEach((interval) => {
-            rules.push({
-                'id': nextId(),
-                'day': day,
-                'start': interval.start,
-                'end': interval.end
-            });
+  // Retorna o próximo ID disponível
+  function nextId() {
+    return (rules.length > 0) ? rules[rules.length - 1].id + 1 : 1;
+  }
+
+  // Valida conflito de horários na inserção de regras
+  function insertValidation(start, end) {
+    return rules.find(rule => rule.day === day &&
+      ((rule.start <= start && start <= rule.end ||
+      rule.start <= end && end <= rule.end) ||
+      (start < rule.start && end > rule.end))) === undefined;
+  }
+
+  // Gravar registro único
+  function createUnique() {
+    intervals.forEach((interval) => {
+      if (formatDate(day) > new Date() && insertValidation(interval.start, interval.end)) {
+        rules.push({
+          'id': nextId(),
+          'day': day,
+          'start': interval.start,
+          'end': interval.end
         });
+      }
+    });
 
-        files.saveFile();
+    files.saveFile();
+  }
+
+  // Gravar registros múltiplos
+  function createMultiple() {
+    let weekDay, month, ruleDay, year;
+
+    for (newDay; newDay <= formatDate(limit); newDay.setDate(newDay.getDate() + 1)) {
+      ruleDay = newDay.getDate();
+      ruleDay = (ruleDay < 10) ? '0' + ruleDay : ruleDay;
+
+      month = newDay.getMonth() + 1;
+      month = (month < 10) ? '0' + month : month;
+          
+      year = newDay.getFullYear();
+
+      day = ruleDay + '-' + month + '-' + year;
+
+      if (weekdays)
+        weekDay = new Date(year, newDay.getMonth(), ruleDay).getDay();
+
+      if (!weekdays || (weekdays && weekdays.indexOf(weekDay) !== -1))
+        createUnique();
+    }
+  }
+
+  // Coverte a data para o padrão do JS
+  function formatDate(date) {
+    date = date.split('-');
+
+    return new Date(date[2], date[1] - 1, parseInt(date[0]) + 1);
+  }
+
+  // Cadastrar regras de horários para atendimento
+  function createRule(params) {
+    let flag = params.flag;
+
+    intervals = params.intervals;
+    day = params.day;
+    limit = params.limit;
+    weekdays = params.weekdays;
+
+    validation.validate('intervals', intervals, validationRules['intervals']);
+
+    intervals.forEach((interval) => {
+      validation.validate('start', interval.start, validationRules['start']);
+      validation.validate('end', interval.end, validationRules['end']);
+    });
+
+    switch (flag) {
+      case 'u':
+        validation.validate('day', day, validationRules['day']);
+
+        createUnique();
+
+        break;
+
+      case 'd':
+        validation.validate('limit', limit, validationRules['limit']);
+
+        createMultiple();
+
+        break;
+
+      case 'w':
+        validation.validate('limit', limit, validationRules['limit']);
+        validation.validate('weekdays', weekdays, validationRules['weekdays']);
+
+        createMultiple();
+
+        break;
+
+      default:
+        throw new Error('Missing or wrong "flag".');
+
+        break;
     }
 
-    // Gravar registros múltiplos
-    function createMultiple() {
-        let weekDay, year;
+    return rules;
+  }
 
-        for (newDay; newDay <= formatDate(limit); newDay.setDate(newDay.getDate() + 1)) {
-            ruleDay = newDay.getDate();
-            ruleDay = (ruleDay < 10) ? '0' + ruleDay : ruleDay;
+  // Apagar regra de horário para atendimento
+  function deleteRule(id) {
+    let dataLength = rules.length;
+    let dataLengthAfter;
 
-            month = newDay.getMonth() + 1;
-            month = (month < 10) ? '0' + month : month;
-            
-            year = newDay.getFullYear();
+    let ruleFound = rules.find(rule => rule.id === parseInt(id));
+    let ruleIndex = rules.indexOf(ruleFound);
 
-            day = ruleDay + '-' + month + '-' + year;
+    if (ruleIndex !== -1)
+      rules.splice(ruleIndex, 1);
 
-            if (weekdays)
-                weekDay = new Date(year, newDay.getMonth(), ruleDay).getDay();
+    dataLengthAfter = rules.length;
 
-            if (!weekdays || (weekdays && weekdays.indexOf(weekDay) !== -1))
-                createUnique();
-        }
-    }
+    if (dataLength == dataLengthAfter)
+      throw new Error('No rule found to delete.');
 
-    // Coverte a data para o padrão do JS
-    function formatDate(date) {
-        date = date.split('-');
+    files.saveFile();
 
-        return new Date(date[2], date[1] - 1, parseInt(date[0]) + 1);
-    }
+    return rules;
+  }
 
-    // Cadastrar regras de horários para atendimento
-    function createRule(params) {
-        let flag = params.flag;
+  // Listar regras de horários para atendimento
+  function getRules() {
+    return rules;
+  }
 
-        intervals = params.intervals;
-        day = params.day;
-        limit = params.limit;
-        weekdays = params.weekdays;
+  // Listar horários disponíveis dentro de um intervalo
+  function getInterval(params) {
+    let ruleDay;
 
-        // if (validator.isEmpty(intervals))
-        //     throw new Error('Missing "intervals".');
+    validation.validate('start', params.start, validationRules['startDate']);
+    validation.validate('end', params.end, validationRules['endDate']);
 
-        intervals.forEach((interval) => {
-            if (!interval.start || validator.isEmpty(interval.start))
-                throw new Error('Missing start "date".');
+    startDate = formatDate(params.start);
+    endDate = formatDate(params.end);
 
-            if (!interval.end || validator.isEmpty(interval.end))
-                throw new Error('Missing end "date".');
-        });
+    return rules.filter((rule) => {
+      ruleDay = formatDate(rule.day);
 
-        switch (flag) {
-            case 'u':
-                if (!day || validator.isEmpty(day))
-                    throw new Error('Missing "day".');
+      return (startDate <= ruleDay) && (ruleDay <= endDate);
+    });
+  }
 
-                if (!validator.isDate(day, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"day" in wrong format.');
-
-                createUnique();
-
-                break;
-
-            case 'd':
-                if (!validator.isDate(limit, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"limit" in wrong format.');
-
-                createMultiple();
-
-                break;
-
-            case 'w':
-                if (!validator.isDate(limit, { format: 'DD-MM-YYYY', delimiters: ['-'] }))
-                    throw new Error('"limit" in wrong format.');
-
-                if (!weekdays)
-                    throw new Error('Missing "weekdays".');
-
-                createMultiple();
-
-                break;
-
-            default:
-                throw new Error('Missing or wrong "flag".');
-
-                break;
-        }
-
-        return rules;
-    }
-
-    // Apagar regra de horário para atendimento
-    function deleteRule(id) {
-        let dataLength = rules.length;
-        let dataLengthAfter;
-
-        let ruleFound = rules.find(rule => rule.id === parseInt(id));
-        let ruleIndex = rules.indexOf(ruleFound);
-
-        if (ruleIndex !== -1)
-            rules.splice(ruleIndex, 1);
-
-        dataLengthAfter = rules.length;
-
-        // if (validator.equals(dataLength, dataLengthAfter))
-        //     throw new Error('No rule found to delete.');
-    
-        files.saveFile();
-
-        return rules;
-    }
-
-    // Listar regras de horários para atendimento
-    function getRules() {
-        return rules;
-    }
-
-    // Listar horários disponíveis dentro de um intervalo
-    function getInterval(params) {
-        if (validator.isEmpty(params.start))
-            throw new Error('Missing "start".');
-
-        if (validator.isEmpty(params.end))
-            throw new Error('Missing "end".');
-
-        start = formatDate(params.start);
-        end = formatDate(params.end);
-
-        return rules.filter((rule) => {
-            ruleDay = formatDate(rule.day);
-
-            return (start <= ruleDay) && (ruleDay <= end);
-        });
-    }
-
-    return {
-        createRule,
-        deleteRule,
-        getRules,
-        getInterval
-    };
+  return {
+    createRule,
+    deleteRule,
+    getRules,
+    getInterval
+  };
 }
 
 export default rules;

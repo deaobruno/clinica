@@ -1,65 +1,150 @@
-TODO
-- corrigir validações
-- implementar gerenciador de erros
-- aplicar carregamento único do express
-- configurar inialização corretamente
-- abstrair validação
-- abstrair chamada de rotas
-- validar inserção de regras repetidas
-- gerar documentação
-- aplicar TDD
-- converter para TYpescrypt
+## Descrição
 
-EXEMPLOS
+Projeto de gerenciamento do cadastro de horários de atendimentos de uma clínica.
+Desenvolvido como etapa de teste para processo seletivo da Suno Research.
 
-unique example
+## Informações
+
+Para rodar o projeto, usar o comando
+
+```
+npm run dev
+```
+
+## Exemplos
+
+/POST create (unique)
 {
-    "day": "01-01-2021",
-    "intervals": [
-        {
-            "start": "09:00",
-            "end": "10:00"
+    "request":{
+        "method":"POST",
+        "header":[],
+        "body":{
+            "mode":"raw",
+            "raw":"{
+                "day": "20-01-2021",
+                "intervals": [
+                    {
+                        "start": "09:00",
+                        "end": "10:00"
+                    },
+                    {
+                        "start": "11:00",
+                        "end": "12:00"
+                    }
+                ],
+                "flag": "u"
+            }",
+            "options":{
+                "raw":{
+                    "language":"json"
+                }
+            }
         },
-        {
-            "start": "11:00",
-            "end": "12:00"
-        }
-    ],
-    "flag": "u"
+        "url":"localhost:8000/create"
+    }
 }
-01
 
-daily example
+/POST create (daily)
 {
-    "intervals": [
-        {
-            "start": "09:00",
-            "end": "10:00"
+    "request":{
+        "method":"POST",
+        "header":[],
+        "body":{
+            "mode":"raw",
+            "raw":"{
+                "intervals": [
+                    {
+                        "start": "09:00",
+                        "end": "10:00"
+                    },
+                    {
+                        "start": "11:00",
+                        "end": "12:00"
+                    }
+                ],
+                "flag": "d",
+                "limit": "22-01-2021"
+            }",
+            "options":{
+                "raw":{
+                    "language":"json"
+                }
+            }
         },
-        {
-            "start": "11:00",
-            "end": "12:00"
-        }
-    ],
-    "flag": "d",
-    "limit": "17-01-2021"
+        "url":"localhost:8000/create"
+    },
 }
-15, 16, 17
 
-weekly example
+/POST create (weekly)
 {
-    "intervals": [
-        {
-            "start": "09:00",
-            "end": "10:00"
+    "request":{
+        "method":"POST",
+        "header":[],
+        "body":{
+            "mode":"raw",
+            "raw":"{
+                "intervals": [
+                    {
+                        "start": "09:00",
+                        "end": "10:00"
+                    },
+                    {
+                        "start": "11:00",
+                        "end": "12:00"
+                    }
+                ],
+                "flag": "w",
+                "limit": "20-02-2021",
+                "weekdays": [1, 3]
+            }",
+            "options":{
+                "raw":{
+                    "language":"json"
+                }
+            }
         },
-        {
-            "start": "11:00",
-            "end": "12:00"
-        }
-    ],
-    "flag": "w",
-    "limit": "15-02-2021",
-    "weekdays": [1, 3]
+        "url":"localhost:8000/create"
+    },
 }
-18, 20, 25, 27, 1, 3, 8, 10, 15
+
+/GET list
+{
+    "request":{
+        "method":"GET",
+        "header":[],
+        "url":"localhost:8000/list"
+    }
+}
+
+/POST interval
+{
+    "request":{
+        "method":"POST",
+        "header":[],
+        "body":{
+            "mode":"raw",
+            "raw":"{
+                "start": "25-01-2021",
+                "end": "03-02-2021"
+            }",
+            "options":{
+                "raw":{
+                    "language":"json"
+                }
+            }
+        },
+        "url":"localhost:8000/interval"
+    }
+}
+
+/DELETE delete
+{
+    "request":{
+        "method":"DELETE",
+        "header":[],
+        "url":"localhost:8000/delete/1"
+    }
+}
+
+OBS: Os exemplos podem ser importados pelo seguinte link do Postman:
+https://www.getpostman.com/collections/ec0f8274022a1d585017
