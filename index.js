@@ -6,7 +6,7 @@ import frameworkFactory from './routes/routes.js';
 const framework = frameworkFactory();
 const app = framework.expressApp;
 
-//
+// Permite o envio de valores de qualquer tipo nas requisções
 app.use(bodyParser.json({
   extended: true
 }));

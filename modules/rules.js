@@ -1,10 +1,10 @@
-// Carrega a biblioteca Validator para...
+// Carrega a factory de validação
 import validatorFactory from './validation.js';
 const validation = validatorFactory();
 
 // Carrega a factory do gerenciador do arquivo de regitros
-import filesFactory from './file.js';
-const files = filesFactory();
+import fileFactory from './file.js';
+const files = fileFactory();
 
 function rules() {
   let rules = files.rulesData;
@@ -29,6 +29,7 @@ function rules() {
     return (rules.length > 0) ? rules[rules.length - 1].id + 1 : 1;
   }
 
+  // Valida conflito de horários na inserção de regras
   function insertValidation(start, end) {
     return rules.find(rule => rule.day === day &&
       ((rule.start <= start && start <= rule.end ||
@@ -39,7 +40,7 @@ function rules() {
   // Gravar registro único
   function createUnique() {
     intervals.forEach((interval) => {
-      if (insertValidation(interval.start, interval.end)) {
+      if (formatDate(day) > new Date() && insertValidation(interval.start, interval.end)) {
         rules.push({
           'id': nextId(),
           'day': day,

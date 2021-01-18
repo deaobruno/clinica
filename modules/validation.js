@@ -1,31 +1,36 @@
-// Carrega a biblioteca Validator para...
+// Carrega a biblioteca Validator para validar atributos
 import validator from 'validator';
 
 function validation() {
   const rulesTypes = ['empty', 'date', 'time'];
   let rules, msg, val;
 
+  // Valida se o atributo existe ou está vazio
   function empty() {
     return (!val || validator.isEmpty(val + ''));
   }
 
+  // Valida se o atributo atende o formato de data
   function date() {
     return (!validator.isDate(val + '', { format: 'DD-MM-YYYY', delimiters: ['-'] }));
   }
 
+  // Valida se o atributo atende o formato de tempo
   function time() {
     return (!validator.matches(val + '', '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'));
   }
 
+  // Valida se o atributo é um array
   function array() {
     return !Array.isArray(val);
   }
 
+  // Retorna uma mensagem de erro caso algum atributo não tenha passado na validação
   function throwError(attributeName) {
     throw new Error(msg);
   }
 
-  // Escreve os dados do array de regras no arquivo
+  // Valida os atributos das regras
   function validate(attribute, value, rulesArray) {
     let answer;
 

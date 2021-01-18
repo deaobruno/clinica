@@ -1,4 +1,4 @@
-// Carrega a biblioteca File System para..
+// Carrega a biblioteca File System para gerenciar o acesso ao arquivo de registros
 import fs from 'fs';
 
 function file() {
