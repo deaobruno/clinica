@@ -29,16 +29,18 @@ function rules() {
   // Valida conflito de horários na inserção de regras
   function insertValidation(start, end) {
     return rules.find(rule => rule.day === day &&
-      ((rule.start <= start && start <= rule.end ||
-      rule.start <= end && end <= rule.end) ||
-      (start < rule.start && end > rule.end))) === undefined;
+      ((rule.start < start && start < rule.end ||
+      rule.start < end && end < rule.end) ||
+      (start <= rule.start && end >= rule.end))) === undefined;
+
+
   }
 
   // Gravar registro único
   function createUnique() {
     intervals.forEach((interval) => {
       if (!insertValidation(interval.start, interval.end))
-        throw new Error('The following rule has a schedule conflict: Day: '+ day +' Start: '+ interval.start + ' End: '+ interval.end);
+        throw new Error('The following rule has a schedule conflict: Day: '+ day +' Start: '+ interval.start +' End: '+ interval.end);
 
       rules.push({
         'id': nextId(),
