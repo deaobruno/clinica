@@ -54,11 +54,13 @@ function rules() {
   // Gravar registros múltiplos
   function createMultiple() {
     let newDay = new Date();
+    let limitDate = formatDate(limit);
     let weekDay, month, ruleDay, year;
 
     newDay.setDate(newDay.getDate() + 1);
+    limitDate.setDate(limitDate.getDate() + 1);
 
-    for (newDay; newDay <= formatDate(limit); newDay.setDate(newDay.getDate() + 1)) {
+    for (newDay; newDay <= limitDate; newDay.setDate(newDay.getDate() + 1)) {
       ruleDay = newDay.getDate();
       ruleDay = (ruleDay < 10) ? '0' + ruleDay : ruleDay;
 
