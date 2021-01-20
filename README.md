@@ -5,6 +5,12 @@ Desenvolvido como etapa de teste para processo seletivo da Suno Research.
 
 ## Informações
 
+Para instalar os pacotes necessários para rodar o projeto, usar o comando
+
+```
+npm run install
+```
+
 Para rodar o projeto, usar o comando
 
 ```
@@ -12,12 +18,11 @@ npm run dev
 ```
 
 ## Exemplos
-
+```
 /POST create (unique)
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -48,7 +53,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -79,7 +83,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -95,7 +98,7 @@ npm run dev
                 ],
                 "flag": "w",
                 "limit": "20-02-2021",
-                "weekdays": [1, 3]
+                "weekdays": [1, 3] // array de dias da semana iniciando em 0 [0 = domingo, 1 = segunda, ...]
             }",
             "options":{
                 "raw":{
@@ -111,7 +114,6 @@ npm run dev
 {
     "request":{
         "method":"GET",
-        "header":[],
         "url":"localhost:8000/list"
     }
 }
@@ -120,7 +122,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -141,10 +142,9 @@ npm run dev
 {
     "request":{
         "method":"DELETE",
-        "header":[],
         "url":"localhost:8000/delete/1"
     }
 }
-
+```
 OBS: Os exemplos podem ser importados pelo seguinte link do Postman:
 https://www.getpostman.com/collections/ec0f8274022a1d585017

@@ -25,6 +25,13 @@ function validation() {
     return !Array.isArray(val);
   }
 
+  // Valida se a data é maior que hoje
+  function today() {
+    val = val.split('-');
+
+    return new Date(val[2], parseInt(val[1]) - 1, val[0]) < new Date();
+  }
+
   // Retorna uma mensagem de erro caso algum atributo não tenha passado na validação
   function throwError(attributeName) {
     throw new Error(msg);
@@ -57,6 +64,11 @@ function validation() {
         case 'array':
           msg = '"'+ attribute +'" is not an array.';
           answer = array();
+          break;
+
+        case 'today':
+          msg = '"'+ attribute +'" must be greater than today.';
+          answer = today();
           break;
       }
 

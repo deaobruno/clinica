@@ -8,17 +8,14 @@ const files = fileFactory();
 
 function rules() {
   let rules = files.rulesData;
-
-  let newDay = new Date();
-
   let day, end, endDate, intervals, limit, start, startDate, weekdays;
 
   const validationRules = {
-    'day': ['empty', 'date'],
+    'day': ['empty', 'date', 'today'],
     'end': ['empty', 'time'],
     'endDate': ['empty', 'date'],
     'intervals': ['empty'],
-    'limit': ['empty', 'date'],
+    'limit': ['empty', 'date', 'today'],
     'start': ['empty', 'time'],
     'startDate': ['empty', 'date'],
     'weekdays': ['empty', 'array']
@@ -32,22 +29,25 @@ function rules() {
   // Valida conflito de horários na inserção de regras
   function insertValidation(start, end) {
     return rules.find(rule => rule.day === day &&
-      ((rule.start <= start && start <= rule.end ||
-      rule.start <= end && end <= rule.end) ||
-      (start < rule.start && end > rule.end))) === undefined;
+      ((rule.start < start && start < rule.end ||
+      rule.start < end && end < rule.end) ||
+      (start <= rule.start && end >= rule.end))) === undefined;
+
+
   }
 
   // Gravar registro único
   function createUnique() {
     intervals.forEach((interval) => {
-      if (formatDate(day) > new Date() && insertValidation(interval.start, interval.end)) {
-        rules.push({
-          'id': nextId(),
-          'day': day,
-          'start': interval.start,
-          'end': interval.end
-        });
-      }
+      if (!insertValidation(interval.start, interval.end))
+        throw new Error('The following rule has a schedule conflict: Day: '+ day +' Start: '+ interval.start +' End: '+ interval.end);
+
+      rules.push({
+        'id': nextId(),
+        'day': day,
+        'start': interval.start,
+        'end': interval.end
+      });
     });
 
     files.saveFile();
@@ -55,9 +55,14 @@ function rules() {
 
   // Gravar registros múltiplos
   function createMultiple() {
+    let newDay = new Date();
+    let limitDate = formatDate(limit);
     let weekDay, month, ruleDay, year;
 
-    for (newDay; newDay <= formatDate(limit); newDay.setDate(newDay.getDate() + 1)) {
+    newDay.setDate(newDay.getDate() + 1);
+    limitDate.setDate(limitDate.getDate() + 1);
+
+    for (newDay; newDay <= limitDate; newDay.setDate(newDay.getDate() + 1)) {
       ruleDay = newDay.getDate();
       ruleDay = (ruleDay < 10) ? '0' + ruleDay : ruleDay;
 
@@ -80,7 +85,7 @@ function rules() {
   function formatDate(date) {
     date = date.split('-');
 
-    return new Date(date[2], date[1] - 1, parseInt(date[0]) + 1);
+    return new Date(date[2], date[1] - 1, date[0]);
   }
 
   // Cadastrar regras de horários para atendimento
@@ -135,7 +140,6 @@ function rules() {
   function deleteRule(id) {
     let dataLength = rules.length;
     let dataLengthAfter;
-
     let ruleFound = rules.find(rule => rule.id === parseInt(id));
     let ruleIndex = rules.indexOf(ruleFound);
 
