@@ -18,12 +18,11 @@ npm run dev
 ```
 
 ## Exemplos
-```json
+```
 /POST create (unique)
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -54,7 +53,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -85,7 +83,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -117,7 +114,6 @@ npm run dev
 {
     "request":{
         "method":"GET",
-        "header":[],
         "url":"localhost:8000/list"
     }
 }
@@ -126,7 +122,6 @@ npm run dev
 {
     "request":{
         "method":"POST",
-        "header":[],
         "body":{
             "mode":"raw",
             "raw":"{
@@ -147,7 +142,6 @@ npm run dev
 {
     "request":{
         "method":"DELETE",
-        "header":[],
         "url":"localhost:8000/delete/1"
     }
 }
